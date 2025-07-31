@@ -1,140 +1,176 @@
 openapi: 3.0.0
 info:
+  name: customerproductandservicedirectory-x
   title: CustomerProductandServiceDirectory_X
   description: |
-    API que permite la creación de cuentas de clientes (PN) de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE).
+    API para la creación de cuentas de clientes (PN) de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE), alineada a especificación BIAN.
   version: 1.0.0
   contact:
     name: Líder de Producto
+    email: lider.producto@empresa.com
+  x-plataforma: IBM API Connect
+  x-endpoints:
+    desarrollo: https://gw.dev.dombifaws.com/dev/int/x/v1.0/customerproductandservicedirectory/product/natural/register
+    certificacion: https://gw.qas.dombifaws.com/qas/int/x/v1.0/customerproductandservicedirectory/product/natural/register
+    produccion: https://gw.dombifaws.com/api/int/x/v1.0/customerproductandservicedirectory/product/natural/register
+
 servers:
-  - url: https://api.example.com/v1
-    description: Servidor de producción
-  - url: https://api-dev.example.com/v1
-    description: Servidor de desarrollo
+  - url: https://gw.dev.dombifaws.com/dev/int
+    description: Desarrollo
+  - url: https://gw.qas.dombifaws.com/qas/int
+    description: Certificación
+  - url: https://gw.dombifaws.com/api/int
+    description: Producción
 
 tags:
-  - name: Cuentas
-    description: Operaciones relacionadas con la creación de cuentas
+  - name: CustomerProductandServiceDirectory
+    description: Operaciones BIAN para Customer Product and Service Directory
 
 paths:
-  /accounts:
+  /x/v1.0/customerproductandservicedirectory/product/natural/register:
     post:
       tags:
-        - Cuentas
-      summary: Crear una nueva cuenta
-      description: Permite la creación de la cuenta de un cliente (PN), de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE).
-      operationId: createAccount
+        - CustomerProductandServiceDirectory
+      summary: Registrar cuenta de cliente (PN) - BIAN
+      description: Permite la creación de la cuenta de un cliente (PN), de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE), alineado a BIAN.
+      operationId: registerCustomerProductandServiceDirectoryProductNatural
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccountCreationRequest'
+              $ref: '#/components/schemas/RegisterCustomerProductandServiceDirectoryProductNatural'
+            example:
+              RegisterCustomerProductandServiceDirectoryProductNatural:
+                ServiceType: "S00003"
+                CustomerReference: "000000000"
+                ProductIdentification: "ANWS"
+                CurrencyCode: "SOL"
+                PartyRoleCode: "000001112"
       responses:
-        '201':
-          description: Cuenta creada exitosamente
+        '200':
+          description: Registro exitoso
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountCreationResponse'
+                $ref: '#/components/schemas/RegisterCustomerProductandServiceDirectoryProductNaturalResponse'
+              example:
+                RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+                  CustomerReference: "000000000"
+                  AccountNumber: 8028036210
+                  ProductIdentification: "ANWS"
+                  CurrencyCode: "SOL"
+                  Branch:
+                    Identification: "100"
+                  PartyRoleCode: "000001112"
+                  IBAN: "03820110802803621005"
+                  OpeningDate: "20240115"
+                  OpeningTime: "114000"
         '400':
-          description: Datos de entrada inválidos
+          description: Error de validación de campos obligatorios
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/RegisterCustomerProductandServiceDirectoryProductNaturalError'
+              example:
+                RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+                  Status: "ERROR"
+                  StatusCode: "-1"
+                  Message: "Validación de campos obligatorios fallida."
         '401':
           description: No autorizado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Error interno del servidor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
-    AccountCreationRequest:
+    RegisterCustomerProductandServiceDirectoryProductNatural:
       type: object
-      required:
-        - clientId
-        - accountType
       properties:
-        clientId:
-          type: string
-          description: Identificador único del cliente
-          example: "12345678"
-        accountType:
-          type: string
-          enum: [AHOR, CCTE]
-          description: Tipo de cuenta a crear (AHOR=Cuenta Ahorro, CCTE=Cuenta Corriente)
-        currency:
-          type: string
-          description: Moneda de la cuenta
-          example: "PEN"
-        branch:
-          type: string
-          description: Código de la sucursal
-          example: "001"
-        additionalData:
+        RegisterCustomerProductandServiceDirectoryProductNatural:
           type: object
-          description: Datos adicionales específicos según el tipo de cuenta
-          
-    AccountCreationResponse:
+          required:
+            - ServiceType
+            - CustomerReference
+            - ProductIdentification
+            - CurrencyCode
+            - PartyRoleCode
+          properties:
+            ServiceType:
+              type: string
+              example: "S00003"
+            CustomerReference:
+              type: string
+              example: "000000000"
+            ProductIdentification:
+              type: string
+              example: "ANWS"
+            CurrencyCode:
+              type: string
+              example: "SOL"
+            PartyRoleCode:
+              type: string
+              example: "000001112"
+
+    RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
       type: object
       properties:
-        accountId:
-          type: string
-          description: Número de cuenta generado
-          example: "123456789012345"
-        clientId:
-          type: string
-          description: Identificador del cliente
-          example: "12345678"
-        accountType:
-          type: string
-          description: Tipo de cuenta creada
-          example: "AHOR"
-        creationDate:
-          type: string
-          format: date-time
-          description: Fecha y hora de creación de la cuenta
-        status:
-          type: string
-          description: Estado de la cuenta
-          example: "ACTIVE"
-        
-    ErrorResponse:
+        RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+          type: object
+          properties:
+            CustomerReference:
+              type: string
+              example: "000000000"
+            AccountNumber:
+              type: integer
+              example: 8028036210
+            ProductIdentification:
+              type: string
+              example: "ANWS"
+            CurrencyCode:
+              type: string
+              example: "SOL"
+            Branch:
+              type: object
+              properties:
+                Identification:
+                  type: string
+                  example: "100"
+            PartyRoleCode:
+              type: string
+              example: "000001112"
+            IBAN:
+              type: string
+              example: "03820110802803621005"
+            OpeningDate:
+              type: string
+              example: "20240115"
+            OpeningTime:
+              type: string
+              example: "114000"
+
+    RegisterCustomerProductandServiceDirectoryProductNaturalError:
       type: object
       properties:
-        code:
-          type: string
-          description: Código de error
-        message:
-          type: string
-          description: Mensaje descriptivo del error
-        details:
-          type: array
-          items:
-            type: object
-            properties:
-              field:
-                type: string
-                description: Campo que generó el error
-              message:
-                type: string
-                description: Mensaje específico del error en el campo
+        RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+          type: object
+          properties:
+            Status:
+              type: string
+              example: "ERROR"
+            StatusCode:
+              type: string
+              example: "-1"
+            Message:
+              type: string
+              example: "Validación de campos obligatorios fallida."
 
   securitySchemes:
     OAuth2:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: https://auth.example.com/token
+          tokenUrl: https://gw.dev.banbif.com.pe/dev/ext/banbifoauth/oauth2/token
           scopes:
             accounts:write: Crear cuentas
 
