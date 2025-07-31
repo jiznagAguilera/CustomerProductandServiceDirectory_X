@@ -14,6 +14,21 @@ info:
     certificacion: https://gw.qas.dombifaws.com/qas/int/x/v1.0/customerproductandservicedirectory/product/natural/register
     produccion: https://gw.dombifaws.com/api/int/x/v1.0/customerproductandservicedirectory/product/natural/register
 
+# Configuración específica de IBM API Connect
+x-ibm-configuration:
+  cors:
+    enabled: true
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  compatibility:
+    suppress-limitation-errors: true
+  application-authentication:
+    certificate: false
+  catalogs: {}
+
 servers:
   - url: https://gw.dev.dombifaws.com/dev/int
     description: Desarrollo
@@ -34,6 +49,80 @@ paths:
       summary: Registrar cuenta de cliente (PN) - BIAN
       description: Permite la creación de la cuenta de un cliente (PN), de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE), alineado a BIAN.
       operationId: registerCustomerProductandServiceDirectoryProductNatural
+      parameters:
+        - name: Authorization
+          in: header
+          description: Contiene las credenciales para autorizar al consumidor del uso del servicio BUS. La autorización es tipo básica.
+          required: true
+          schema:
+            type: string
+            example: "Basic EncodeBase64(<USER>:<PASS>)"
+        - name: Content-Type
+          in: header
+          description: Tipo de contenido intercambiado. Se considera application/json;charset=UTF-8.
+          required: true
+          schema:
+            type: string
+            example: "application/json;charset=UTF-8"
+        - name: Time-Stamp
+          in: header
+          description: Fecha y hora en la se origina la transacción en el consumidor.
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: "2024-07-31T12:22:45.923Z"
+        - name: X-Correlation-Id
+          in: header
+          description: Identificador único originado desde el consumidor. Este identificador viaja por todas las capas.
+          required: true
+          schema:
+            type: string
+            pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            example: "4fe5aa7b-4961-40b4-9f90-f68320306d17"
+        - name: X-Consumer-Id
+          in: header
+          description: Canal consumidor del servicio que inició la transacción.
+          required: true
+          schema:
+            type: string
+            pattern: "^[A-Z]{3}\\d{3}$"
+            example: "APP213"
+        - name: Host-Id
+          in: header
+          description: IP o Hostname del servidor de donde se realizó la transacción.
+          required: false
+          schema:
+            type: string
+            example: "192.168.1.1"
+        - name: Branch-Code
+          in: header
+          description: Código de la sucursal de donde se realizó la transacción.
+          required: false
+          schema:
+            type: string
+            example: "100"
+        - name: Country-Code
+          in: header
+          description: Código del país.
+          required: false
+          schema:
+            type: string
+            example: "PE"
+        - name: User-Id
+          in: header
+          description: Identificador del usuario que realizó la transacción.
+          required: false
+          schema:
+            type: string
+            example: "USUARIO01"
+        - name: Device-Id
+          in: header
+          description: Identificador del dispositivo de donde se realizó la transacción.
+          required: false
+          schema:
+            type: string
+            example: "DEVICE001"
       requestBody:
         required: true
         content:
@@ -50,6 +139,94 @@ paths:
       responses:
         '200':
           description: Registro exitoso
+          headers:
+            TimeStamp:
+              description: Fecha y hora en la que se responde al consumidor.
+              schema:
+                type: string
+                format: date-time
+                example: "2024-07-30T14:10:30.145"
+            HttpCode:
+              description: Código de Estado HTTP.
+              schema:
+                type: string
+                example: "200"
+            HttpMessage:
+              description: Descripción de Estado HTTP.
+              schema:
+                type: string
+                example: "Success."
+            X-Correlation-Id:
+              description: Identificador único originado desde el consumidor.
+              schema:
+                type: string
+                example: "4fe5aa7b-4961-40b4-9f90-f68320306d17"
+            X-Request-Id:
+              description: Identificador único de la transacción generada por el servicio BUS.
+              schema:
+                type: string
+                example: "202407301410301450"
+            ApiResponseCode:
+              description: Código de respuesta de la transacción.
+              schema:
+                type: string
+                example: "0"
+            ApiResponseMessage:
+              description: Mensaje de respuesta de la transacción.
+              schema:
+                type: string
+                example: "Ejecución con éxito"
+            Access-Control-Allow-Origin:
+              description: Encabezado que se utiliza para validar que origen puede acceder al recurso.
+              schema:
+                type: string
+                example: "*"
+            Access-Control-Allow-Methods:
+              description: Especifica los métodos HTTP permitidos para acceder al recurso.
+              schema:
+                type: string
+                example: "GET, POST, PUT"
+            Access-Control-Allow-Headers:
+              description: Enumera los encabezados que el cliente puede incluir en la solicitud.
+              schema:
+                type: string
+                example: "Origin, Content-Type, Accept"
+            Access-Control-Allow-Credentials:
+              description: Indica que las solicitudes pueden incluir credenciales.
+              schema:
+                type: string
+                enum: ["true", "false"]
+                example: "true"
+            Content-Type:
+              description: Tipo de contenido de la respuesta.
+              schema:
+                type: string
+                example: "application/json"
+            Cache-Control:
+              description: Evita que la información confidencial se almacene en caché.
+              schema:
+                type: string
+                example: "no-store"
+            Content-Security-Policy:
+              description: Para protegerse contra ataques de clickjacking.
+              schema:
+                type: string
+                example: "frame-ancestors 'none'"
+            Strict-Transport-Security:
+              description: Requerir conexiones a través de HTTPS.
+              schema:
+                type: string
+                example: "max-age=15552000"
+            X-Content-Type-Options:
+              description: Para evitar que los navegadores realicen análisis MIME.
+              schema:
+                type: string
+                example: "nosniff"
+            X-Frame-Options:
+              description: Para protegerse contra ataques de clickjacking.
+              schema:
+                type: string
+                example: "DENY"
           content:
             application/json:
               schema:
@@ -75,12 +252,30 @@ paths:
               example:
                 RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
                   Status: "ERROR"
-                  StatusCode: "-1"
-                  Message: "Validación de campos obligatorios fallida."
+                  StatusCode: "01"
+                  Message: "La solicitud posee una sintaxis incorrecta o falta parametro(s) requerido(s)"
         '401':
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterCustomerProductandServiceDirectoryProductNaturalError'
+              example:
+                RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+                  Status: "ERROR"
+                  StatusCode: "01"
+                  Message: "No se proporcionó la información de autorización en la solicitud"
         '500':
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterCustomerProductandServiceDirectoryProductNaturalError'
+              example:
+                RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
+                  Status: "ERROR"
+                  StatusCode: "03"
+                  Message: "Se ha producido un error interno en el servidor"
 
 components:
   schemas:
@@ -98,18 +293,33 @@ components:
           properties:
             ServiceType:
               type: string
+              minLength: 3
+              maxLength: 6
+              description: Código de servicio
               example: "S00003"
             CustomerReference:
               type: string
+              minLength: 1
+              maxLength: 9
+              description: Código de cliente IBS
               example: "000000000"
             ProductIdentification:
               type: string
+              minLength: 4
+              maxLength: 4
+              description: Código del producto cuenta
               example: "ANWS"
             CurrencyCode:
               type: string
+              minLength: 1
+              maxLength: 3
+              description: Moneda de la cuenta que desea abrir
               example: "SOL"
             PartyRoleCode:
               type: string
+              minLength: 1
+              maxLength: 9
+              description: Código de vendedor
               example: "000001112"
 
     RegisterCustomerProductandServiceDirectoryProductNaturalResponse:
@@ -120,33 +330,58 @@ components:
           properties:
             CustomerReference:
               type: string
+              minLength: 1
+              maxLength: 9
+              description: Código de cliente IBS
               example: "000000000"
             AccountNumber:
               type: integer
+              description: Número de cuenta apertura
               example: 8028036210
             ProductIdentification:
               type: string
+              minLength: 4
+              maxLength: 4
+              description: Código del producto cuenta
               example: "ANWS"
             CurrencyCode:
               type: string
+              minLength: 1
+              maxLength: 3
+              description: Moneda de la cuenta que desea abrir
               example: "SOL"
             Branch:
               type: object
               properties:
                 Identification:
                   type: string
+                  minLength: 1
+                  maxLength: 3
+                  description: Código de la oficina del banco donde se atenderá
                   example: "100"
             PartyRoleCode:
               type: string
+              minLength: 1
+              maxLength: 9
+              description: Código de vendedor
               example: "000001112"
             IBAN:
               type: string
+              minLength: 20
+              maxLength: 20
+              description: Código CCI
               example: "03820110802803621005"
             OpeningDate:
               type: string
+              minLength: 8
+              maxLength: 8
+              description: Fecha de creación de cuenta
               example: "20240115"
             OpeningTime:
               type: string
+              minLength: 1
+              maxLength: 6
+              description: Hora de creación de cuenta
               example: "114000"
 
     RegisterCustomerProductandServiceDirectoryProductNaturalError:
@@ -157,13 +392,17 @@ components:
           properties:
             Status:
               type: string
+              enum: ["ERROR", "WARNING"]
+              description: Estado de la respuesta
               example: "ERROR"
             StatusCode:
               type: string
-              example: "-1"
+              description: Código de error
+              example: "01"
             Message:
               type: string
-              example: "Validación de campos obligatorios fallida."
+              description: Mensaje descriptivo del error
+              example: "La solicitud posee una sintaxis incorrecta o falta parametro(s) requerido(s)"
 
   securitySchemes:
     OAuth2:
