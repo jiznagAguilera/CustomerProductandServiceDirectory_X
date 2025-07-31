@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  name: customerproductandservicedirectory-x
   title: CustomerProductandServiceDirectory_X
+  x-ibm-name: CustomerProductandServiceDirectory_X
   description: |
     API para la creación de cuentas de clientes (PN) de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE), alineada a especificación BIAN.
   version: 1.0.0
@@ -17,10 +17,10 @@ info:
 servers:
   - url: https://gw.dev.dombifaws.com/dev/int
     description: Desarrollo
-  - url: https://gw.qas.dombifaws.com/qas/int
-    description: Certificación
-  - url: https://gw.dombifaws.com/api/int
-    description: Producción
+  # - url: https://gw.qas.dombifaws.com/qas/int
+  #   description: Certificación
+  # - url: https://gw.dombifaws.com/api/int
+  #   description: Producción
 
 tags:
   - name: CustomerProductandServiceDirectory
