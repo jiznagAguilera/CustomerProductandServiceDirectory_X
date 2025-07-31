@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: CustomerProductandServiceDirectory_X
+  description: |
+    API que permite la creación de cuentas de clientes (PN) de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE).
+  version: 1.0.0
+  contact:
+    name: Líder de Producto
+servers:
+  - url: https://api.example.com/v1
+    description: Servidor de producción
+  - url: https://api-dev.example.com/v1
+    description: Servidor de desarrollo
+
+tags:
+  - name: Cuentas
+    description: Operaciones relacionadas con la creación de cuentas
+
+paths:
+  /accounts:
+    post:
+      tags:
+        - Cuentas
+      summary: Crear una nueva cuenta
+      description: Permite la creación de la cuenta de un cliente (PN), de tipo CUENTA AHORRO (AHOR) y CUENTA CORRIENTE (CCTE).
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreationRequest'
+      responses:
+        '201':
+          description: Cuenta creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCreationResponse'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    AccountCreationRequest:
+      type: object
+      required:
+        - clientId
+        - accountType
+      properties:
+        clientId:
+          type: string
+          description: Identificador único del cliente
+          example: "12345678"
+        accountType:
+          type: string
+          enum: [AHOR, CCTE]
+          description: Tipo de cuenta a crear (AHOR=Cuenta Ahorro, CCTE=Cuenta Corriente)
+        currency:
+          type: string
+          description: Moneda de la cuenta
+          example: "PEN"
+        branch:
+          type: string
+          description: Código de la sucursal
+          example: "001"
+        additionalData:
+          type: object
+          description: Datos adicionales específicos según el tipo de cuenta
+          
+    AccountCreationResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Número de cuenta generado
+          example: "123456789012345"
+        clientId:
+          type: string
+          description: Identificador del cliente
+          example: "12345678"
+        accountType:
+          type: string
+          description: Tipo de cuenta creada
+          example: "AHOR"
+        creationDate:
+          type: string
+          format: date-time
+          description: Fecha y hora de creación de la cuenta
+        status:
+          type: string
+          description: Estado de la cuenta
+          example: "ACTIVE"
+        
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código de error
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: Campo que generó el error
+              message:
+                type: string
+                description: Mensaje específico del error en el campo
+
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.example.com/token
+          scopes:
+            accounts:write: Crear cuentas
+
+security:
+  - OAuth2: [accounts:write]
